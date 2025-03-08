@@ -146,3 +146,4 @@ void F_ReCat(C_BudgetCategory& cat, const std::string& newName) {
 //Rename an Expense.
 void F_ReItem(C_CategoryItem& item, const std::string& newName) {
     item.Name = PascalCase(newName);
+}
