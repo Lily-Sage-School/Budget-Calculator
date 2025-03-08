@@ -41,68 +41,71 @@ void F_SetMaxB(std::vector<C_BudgetCategory>& categories) {
 }
 
 void F_SetBRange(C_BudgetCategory& category, float maxBudget) {
-    float subBudget; //Float variable that holds the value of the budget for a subcategory
+    float subBudget; // Float variable that holds the value of the budget for a subcategory
+    int timeFrame;  //Int variable for the number of days that the user inputs
     std::string input;
 
-    //This loop is used to keep asking the user until a valid value is entered.
+    // Loop for valid subcategory budget input
     while (true) {
-        std::cout << "Please enter your budget for " << category.Name << ": "; //This prompts the user to input the value for the specific category they want used
+        std::cout << "Please enter your budget for " << category.Name << ": "; 
         std::cin >> input;
 
-        //This try statement is to convert the input to a float value.
+        // Try to convert input to a float
         try {
-            subBudget = std::stof(input);  //This converts the string input to float
+            subBudget = std::stof(input);  
 
-            //This if statement checks if the value input is negative or null
+            // Check if the budget is valid (positive value)
             if (subBudget <= 0) {
                 std::cout << "Sorry, your budget is invalid. Please enter a positive value for the budget.\n";
                 continue;
             }
 
-            //This if statement checks if the budget for the subcategory exceeds the maximum budget applied to all categories
+            // Check if the budget exceeds the max budget
             if (subBudget > maxBudget) {
                 std::cout << "Sorry, your budget exceeds the maximum budget (" << maxBudget << "). Please enter a budget smaller or equal to the maximum.\n";
                 continue;
             }
 
-            break;  //Break statement to exit the loop if input is valid
+            break;  // Valid input, exit the loop
         }
-        catch (const std::invalid_argument&) { //Catch statement used to find a char or string value instead of a float value
+        catch (const std::invalid_argument&) { 
             std::cout << "Sorry, your budget value is invalid. Please enter a numerical value.\n";
         }
         catch (const std::out_of_range&) {
             std::cout << "Sorry, your budget is too large. Please enter a smaller value.\n";
         }
-        int timeFrame;  // This will store the number of days, allowing for both integers and floats
+    }
 
+    //This loop is used to test for a valid time frame input (in days)
     while (true) {
         std::cout << "Please enter the time frame (in days) for the budget of category '" << category.Name << "': ";
         std::cin >> input;
 
         try {
-            timeFrame = std::stof(input);  //This then converts the input to a float value
-            if (timeFrame <= 0) { //This if statement checks if the value entered is negative or null, which then prompts the user to input the value again
+            timeFrame = std::stoi(input);  // Changed to stoi to store as int
+            if (timeFrame <= 0) {  // Check if the time frame is valid
                 std::cout << "The time frame must be a positive number. Please try again.\n";
-                continue; //This then continues to the break statement
+                continue;
             }
-            break; //This then breaks the user out of the loop
+            break; // Valid time frame, exit the loop
         }
         catch (const std::invalid_argument&) {
             std::cout << "Invalid input. Please enter the number of days for the time frame of your budget.\n";
         }
+        catch (const std::out_of_range&) {
+            std::cout << "The time frame is too large. Please enter a smaller value.\n";
+        }
     }
 
-    category.SetBRange = timeFrame;  //This then stores the time frame in the category's time frame attribute
+    //After collecting both inputs, if then proceeds with the rest of the processing, 
+    //such as saving the budget and time frame to the category
+    category.Budget = subBudget;
+    category.TimeFrame = timeFrame;
 
-    std::cout << "Time frame for category '" << category.Name << "' is set to: "
-        << timeFrame << " days.\n";
-    }
-
-    //This then sets the budget for this subcategory
-    category.SubBudget = subBudget;
-    std::cout << "The budget for " << category.Name << " is set to: " << subBudget << std::endl;
+    std::cout << "Budget for category '" << category.Name << "' has been set to: $"
+              << std::fixed << std::setprecision(2) << category.Budget
+              << " for a time frame of " << category.TimeFrame << " days.\n";
 }
-
 
 //This function is used to calculate the total expenses, the expenses per category, and the expenses per subcategory
 void F_CalcAndBreakDown(const std::vector<C_BudgetCategory>& categories, float maxBudget) {
