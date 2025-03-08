@@ -73,16 +73,7 @@ void F_SetBRange(C_BudgetCategory& category, float maxBudget) {
         catch (const std::out_of_range&) {
             std::cout << "Sorry, your budget is too large. Please enter a smaller value.\n";
         }
-    }
-
-    //This then sets the budget for this subcategory
-    category.SubBudget = subBudget;
-    std::cout << "The budget for " << category.Name << " is set to: " << subBudget << std::endl;
-}
-//This function allows the user to input the time frame that their budget shall last for in days
-void F_SetTimeFrame(C_BudgetCategory& category) {
-    std::string input;
-    float timeFrame;  // This will store the number of days, allowing for both integers and floats
+        int timeFrame;  // This will store the number of days, allowing for both integers and floats
 
     while (true) {
         std::cout << "Please enter the time frame (in days) for the budget of category '" << category.Name << "': ";
@@ -101,10 +92,15 @@ void F_SetTimeFrame(C_BudgetCategory& category) {
         }
     }
 
-    category.TimeFrameDays = timeFrame;  //This then stores the time frame in the category's time frame attribute
+    category.SetBRange = timeFrame;  //This then stores the time frame in the category's time frame attribute
 
     std::cout << "Time frame for category '" << category.Name << "' is set to: "
         << timeFrame << " days.\n";
+    }
+
+    //This then sets the budget for this subcategory
+    category.SubBudget = subBudget;
+    std::cout << "The budget for " << category.Name << " is set to: " << subBudget << std::endl;
 }
 
 
