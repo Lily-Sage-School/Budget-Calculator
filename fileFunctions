@@ -1,0 +1,84 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include "Classes.h"
+
+// Function to save categories and expenses to a file
+void saveToFile(const std::vector<C_BudgetCategory>& categories, const std::string& filename) {
+    std::ofstream outFile(filename, std::ios::out);
+    
+    if (!outFile) {
+        std::cout << "Error opening file for writing.\n";
+        return;
+    }
+    
+    for (const auto& cat : categories) {
+        outFile << cat.Name << "\n";
+        outFile << cat.IsNec << "\n";  // Save whether it's necessary (1 or 0)
+        
+        outFile << cat.Expenses.size() << "\n";  // Save number of expenses
+        for (const auto& exp : cat.Expenses) {
+            outFile << exp.Name << "\n";  // Expense name
+            outFile << exp.SeparationDays << "\n";  // Days between purchases
+            outFile << exp.SubjectiveValue << "\n";  // Subjective value
+            if (exp.AvgExp.has_value()) {
+                outFile << exp.AvgExp.value() << "\n";  // Save average expense value
+            } else {
+                outFile << "N/A\n";  // Indicate no average expense value
+            }
+        }
+    }
+    
+    outFile.close();
+    std::cout << "Data saved to file: " << filename << "\n";
+}
+
+// Function to load categories and expenses from a file
+void loadFromFile(std::vector<C_BudgetCategory>& categories, const std::string& filename) {
+    std::ifstream inFile(filename, std::ios::in);
+    
+    if (!inFile) {
+        std::cout << "Error opening file for reading.\n";
+        return;
+    }
+    
+    categories.clear();  // Clear the current list of categories
+    
+    std::string catName;
+    bool isNec;
+    size_t numExpenses;
+    
+    while (getline(inFile, catName)) {
+        inFile >> isNec;
+        inFile.ignore();  // Ignore the newline after the integer
+        
+        C_BudgetCategory category(catName, isNec);
+        
+        inFile >> numExpenses;
+        inFile.ignore();  // Ignore the newline after the number of expenses
+        
+        for (size_t i = 0; i < numExpenses; ++i) {
+            std::string expName;
+            int expSep, subVal;
+            std::string avgExpLine;
+            float avgExp = 0;
+            
+            getline(inFile, expName);
+            inFile >> expSep >> subVal;
+            inFile.ignore();  // Ignore newline after integers
+            
+            getline(inFile, avgExpLine);
+            if (avgExpLine != "N/A") {
+                avgExp = std::stof(avgExpLine);
+            }
+            
+            category.Expenses.emplace_back(expName, category, expSep, subVal, avgExp);
+        }
+        
+        categories.push_back(category);
+    }
+    
+    inFile.close();
+    std::cout << "Data loaded from file: " << filename << "\n";
+}
